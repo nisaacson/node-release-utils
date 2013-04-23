@@ -9,7 +9,7 @@ function buildTagCmd(tagName) {
 }
 
 function buildCommitCmd(message) {
-    return 'git commit -m "' + message + '" package.json; git push origin master'
+    return 'git add package.json; git commit -m "' + message + '" package.json; git push origin master'
 }
 
 function commitPackageFile(callback) {

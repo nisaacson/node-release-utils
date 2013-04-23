@@ -12,7 +12,7 @@ Installation
 
 Add to your project using npm. E.g.
 
-    npm install node-release-utils
+    npm install release-utils
     
 However it's better to add the project as a dev-dependency in your package.json. See the examples for more information.
 

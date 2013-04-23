@@ -3,24 +3,20 @@ var fs = require('fs');
 var child_process = require('child_process');
 
 var PACKAGE_JSON_FILE = 'package.json';
-var JSON_INDENT = 4;
+var JSON_INDENT = 2;
 var repoPath = path.join(__dirname, '../..')
-function buildTagCmd(tagName) {
-  return '(cd ' + repoPath + ' && git tag ' + tagName
-}
-
 function buildCommitCmd(message) {
-
   return '(cd '+ repoPath + ' && git add package.json && git commit -m "' + message + '" package.json && git push origin master)'
 }
 
-function commitPackageFile(callback) {
-  var cmd = buildCommitCmd('Incrementing version number for next iteration')
+function commitPackageFile(version, callback) {
+  var commitMessage = 'Incrementing version number to ' + version
+  var cmd = buildCommitCmd(commitMessage)
   exec(cmd, callback)
 }
 
 function tagRepo(tagName, callback) {
-  var tagCmd = buildTagCmd(tagName)
+  var tagCmd = '(cd ' + repoPath + ' && git tag ' + tagName + ')'
   exec(tagCmd, callback)
 }
 
@@ -54,14 +50,14 @@ function tagAndIncrementVersion(callback) {
     var newVersion = incrementVersionInJson(packageJson)
     console.log("Updating version in package.json to %s", newVersion)
     writeJSON(packageJson)
-    commitPackageFile(function (error, stdout, stderr) {
+    commitPackageFile(newVersion, function (error, stdout, stderr) {
       callback(packageJson.name, tagName)
     })
   })
 }
 
-function checkoutAndPack(packageName, newTag) {
-  var cmd = '(cd ' + repoPath + ' && rm -rf target && mkdir target && cd target && git clone ../.git code >/dev/null && cd code && git checkout ' + newTag + ' >/dev/null && npm publish)'
+function publish(packageName, newTag) {
+  var cmd = '(cd ' + repoPath + ' && npm publish)'
   exec(cmd, function (error, stdout, stderr) {
     var fileName = stdout.replace('./','').replace('\n', '')
     pushTag(newTag)
@@ -75,5 +71,5 @@ function pushTag(tagName) {
 }
 
 tagAndIncrementVersion(function(packageName, newTag) {
-  checkoutAndPack(packageName, newTag);
+  publish(packageName, newTag);
 })
